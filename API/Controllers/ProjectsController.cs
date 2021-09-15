@@ -1,14 +1,11 @@
 ﻿using API.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace API.Controllers
 {
+    [BasicAuth] // základná autentifikácia pre prístup
     [RoutePrefix("api/Projects")] // prefix pre API
     public class ProjectsController : ApiController
     {
