@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using NLog;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -9,6 +10,8 @@ namespace API.Controllers
     [RoutePrefix("api/Projects")] // prefix pre API
     public class ProjectsController : ApiController
     {
+        public static Logger logger = LogManager.GetLogger("iczLoggerRules");
+
         // GET: api/Projects/
         /// <summary>
         /// Zobrazenie zoznamu všetkých projektov
@@ -17,6 +20,7 @@ namespace API.Controllers
         public async Task<List<Projects>> Get()
         {
             var r = Projects.GetAll();
+            logger.Info("Načítanie zoznamu projektov");
             return await Task.FromResult(r);
         }
 
@@ -30,6 +34,7 @@ namespace API.Controllers
         public async Task<Projects> Get(string id)
         {
             var r = Projects.GetOne(id);
+            logger.Info("Načítanie konkrétneho projektu");
             return await Task.FromResult(r);
         }
 
@@ -41,7 +46,8 @@ namespace API.Controllers
         /// <returns>Správa o vykonaní operácie (úspešné alebo chybová hláška)</returns>
         public string Post([FromBody] Projects p)
         {
-            return Projects.Add(p);
+            string r = Projects.Add(p);
+            return r;
         }
 
         // PUT: api/Projects
@@ -52,7 +58,8 @@ namespace API.Controllers
         /// <returns>Správa o vykonaní operácie (úspešné alebo chybová hláška)</returns>
         public string Put([FromBody] Projects p)
         {
-            return Projects.Edit(p);
+            string r = Projects.Edit(p);
+            return r;
         }
 
         // DELETE: api/Projects/prjX
@@ -64,7 +71,8 @@ namespace API.Controllers
         [Route("{id}")]
         public string Delete(string id)
         {
-            return Projects.Del(id);
+            string r = Projects.Del(id);
+            return r;
         }
     }
 }
