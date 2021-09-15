@@ -1,0 +1,9 @@
+﻿@using System.Configuration;
+
+@{
+    ViewBag.Title = "Index";
+    string redirect = $"{ConfigurationManager.AppSettings["webUrl"].ToString()}Home/Projects";
+    //Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}/Home/Projects");
+}
+
+<meta http-equiv="refresh" content="0;@redirect">

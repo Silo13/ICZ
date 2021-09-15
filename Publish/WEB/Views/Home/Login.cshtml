@@ -1,0 +1,46 @@
+﻿@using System.Configuration;
+@using System.Text;
+
+@{
+    Page.Title = "Prihlásenie";
+    //Layout = "Your Layout Page goes here";
+
+    string s = "";
+
+    if (IsPost)
+    {
+        string t = Request.Form["password"];
+        var b = Encoding.UTF8.GetBytes(t);
+        t = Convert.ToBase64String(b);
+
+        WebClient client = new WebClient();
+
+        client.Encoding = Encoding.UTF8;
+        client.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59;");
+        client.Headers.Add("Authorization", $"Basic {t}");
+
+        string apiUrl = ConfigurationManager.AppSettings["apiUrl"].ToString();
+        try
+        {
+            s = client.DownloadString($"{apiUrl}/api/Projects");
+            Session["login"] = t;
+            Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}Home/Projects");
+        }
+        catch (WebException e)
+        {
+            HttpWebResponse response = (HttpWebResponse)e.Response;
+
+            s = response.StatusCode.ToString();
+            Session.RemoveAll();
+        }
+        s += Request.RawUrl;
+    }
+}
+
+<div class="center-block" style="margin-top: 100px;">
+    <form action="" method="post" class="form-horizontal">
+        <label>Zadajte heslo:</label>
+        <input type="password" name="password" value="" class="form-control" />
+        <button type="submit" class="btn-default">Prihlásiť</button>
+    </form>
+</div>
