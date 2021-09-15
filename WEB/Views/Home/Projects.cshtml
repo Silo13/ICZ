@@ -1,0 +1,153 @@
+﻿@using Newtonsoft.Json;
+@using System.Configuration;
+@using System.Text;
+@using WEB.Models;
+@using System.Collections.Specialized;
+
+@{
+    Page.Title = "Zoznam projektov";
+    //Layout = "Your Layout Page goes here";
+
+    // klient pre prácu s API
+    WebClient client = new WebClient();
+    client.Encoding = Encoding.UTF8;
+    client.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59;");
+    client.Headers.Add("Authorization", $"Basic {Session["login"]}");
+
+    string postMessage = ""; // hlásenie zobrazené po vykonaní operácie
+    string errorMessage = ""; // hlásenie zobrazené v prípade, že sa nepodarí načítať zoznam projektov
+    List<Projects> items = new List<Projects>(); // zoznam projektov
+
+    string deleteId = ""; // pomocná premenná pre mazanie projektu
+    string editId = "";   // pomocná premenná pre editáciu projektu
+    string apiUrl = ConfigurationManager.AppSettings["apiUrl"].ToString(); // načítanie adresy API z konfiguračného súboru web.config
+
+    if (IsPost) // ak bola odoslaná post operácia
+    {
+        // načítanie id pre editáciu (ak sa nemá editovať, zostane prázdne)
+        editId = String.IsNullOrEmpty(Request.Form["Update"]) ? "" : Request.Form["Update"];
+        // načítanie id pre zmazanie zo zoznamu (ak sa nemá zmazať, zostane prázdne)
+        deleteId = String.IsNullOrEmpty(Request.Form["Delete"]) ? "" : Request.Form["Delete"];
+
+        // ak existuje id pre editáciu
+        if (!String.IsNullOrEmpty(editId))
+        {
+            // zistenie, či sa pridáva nový alebo edituje existujúci projekt
+            string method = (editId == "addNewProject") ? "POST" : "PUT";
+            // slovník pre editované údaje
+            Dictionary<string, object> dictData = new Dictionary<string, object>();
+
+            // načítanie hodnôt na editáciu
+            dictData.Add("id", Request.Form["id"] ?? (object)DBNull.Value);
+            dictData.Add("name", Request.Form["name"] ?? (object)DBNull.Value);
+            dictData.Add("abbreviation", Request.Form["abbreviation"] ?? (object)DBNull.Value);
+            dictData.Add("customer", Request.Form["customer"] ?? (object)DBNull.Value);
+
+            // pridanie hlavičky, aby API vedela prečítať prijaté dáta
+            client.Headers["content-type"] = "application/json";
+            // konvertovanie slovníka do JSON formátu
+            //string data = JsonConvert.SerializeObject(dictData, Formatting.Indented);
+            //var result = Encoding.UTF8.GetString(client.UploadData($"{apiUrl}/api/Projects", method, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(dictData, Formatting.Indented))));
+            postMessage = Encoding.UTF8.GetString(client.UploadData($"{apiUrl}/api/Projects", method, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(dictData, Formatting.Indented))));
+            // spustenie operácie a načítanie výsledku
+            //postMessage = Encoding.UTF8.GetString(client.UploadData($"{apiUrl}/api/Projects", method, Encoding.UTF8.GetBytes(data)));
+        }
+
+        // ak existuje id pre zmazanie
+        if (!String.IsNullOrEmpty(deleteId))
+        {
+            // spustenie operácie zmazania a načítanie výsledku
+            postMessage = Encoding.UTF8.GetString(client.UploadValues($"{apiUrl}/api/Projects/{deleteId}", "DELETE", new NameValueCollection()));
+        }
+    }
+
+    try
+    {
+        // načítanie zoznamu projektov
+        items = JsonConvert.DeserializeObject<List<Projects>>(client.DownloadString($"{apiUrl}/api/Projects"));
+        errorMessage = (items == null) ? "Nenašiel sa žiadny záznam." : "";
+    }
+    catch (WebException e)
+    {
+        // ak sa pri načítaní zoznamu projektov vyskytla chyba
+        HttpWebResponse response = (HttpWebResponse)e.Response;
+        errorMessage = response.StatusDescription;
+    }
+}
+
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<p class="alert-info">@postMessage</p>
+
+@if (items != null)
+{
+    foreach (var item in items)
+    {
+        // formuláre pre editáciu existujúcich projektov
+        <form action="" method="post" id="@item.id"></form>
+    }
+    <form action="" method="post" id="addNewProject"></form>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Abbreviation</th>
+                <th>Customer</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in items)
+            {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" value="@item.id" required disabled>
+                        <input type="hidden" name="id" value="@item.id" form="@item.id">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="name" value="@item.name" required form="@item.id">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="abbreviation" value="@item.abbreviation" required form="@item.id">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="customer" value="@item.customer" required form="@item.id">
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary" name="Update" value="@item.id" form="@item.id">Editovať</button>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-danger" name="Delete" value="@item.id" form="@item.id">Zmazať</button>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>
+                    <input type="text" class="form-control" name="id" value="" required form="addNewProject">
+                </td>
+                <td>
+                    <input type="text" class="form-control" name="name" value="" required form="addNewProject">
+                </td>
+                <td>
+                    <input type="text" class="form-control" name="abbreviation" value="" required form="addNewProject">
+                </td>
+                <td>
+                    <input type="text" class="form-control" name="customer" value="" required form="addNewProject">
+                </td>
+                <td colspan="2">
+                    <button type="submit" class="btn btn-block btn-primary" name="Update" value="addNewProject" form="addNewProject">Pridať</button>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+}
+else
+{
+    <p class="danger">@errorMessage</p>
+}
+
+

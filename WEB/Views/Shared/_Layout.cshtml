@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using System.Configuration;
+
+@{
+    if ((Session["login"] == null) && (Request.RawUrl != "/Home/Login") && (Request.RawUrl != "/Home/Logout"))
+    {
+        //return ConfigurationManager.AppSettings["webDevelop"].ToString();
+        Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}/Home/Login");
+    }
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -16,22 +26,23 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("ICZ - Správa projektov firmy", "Projects", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
-            </div>
+            @if ((Session["login"] == null) && (Request.RawUrl != "/Home/Login") && (Request.RawUrl != "/Home/Logout"))
+            {
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("Odhlásiť", "Logout", "Home")</li>
+                    </ul>
+                </div>
+            }
         </div>
     </div>
     <div class="container body-content">
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - ICZ - Správa projektov firmy</p>
         </footer>
     </div>
 

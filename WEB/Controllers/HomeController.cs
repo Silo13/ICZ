@@ -15,15 +15,18 @@ namespace WEB.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
-
             return View();
         }
 
-        public ActionResult Contact()
+        public ActionResult Projects()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Zoznam projektov";
+            return View();
+        }
 
+        public ActionResult Login()
+        {
+            ViewBag.Message = "Prihlásie do aplikácie";
             return View();
         }
     }

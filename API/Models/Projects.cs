@@ -72,6 +72,14 @@ namespace API.Models
                 // načítanie existujúceho zoznamu
                 doc.Load(xmlFile);
 
+                // kontrola, či už nebolo zadané rovnaké id (id musí byť jedinečné)
+                XmlNode checkProject = (XmlElement)doc.SelectSingleNode($"{nodeString}[@id='{p.id}']");
+                // ak sa našiel projekt s rovnakým id, vráti sa chybové hlásenie a zastaví sa vykonávanie metódy
+                if (checkProject != null)
+                {
+                    return $"Id {p.id} už bolo zadané.";
+                }
+
                 XmlNode project = doc.CreateElement("project"); // element pre projekt
                 XmlNode name = doc.CreateElement("name"); // element pre name
                 XmlNode abbreviation = doc.CreateElement("abbreviation"); // element pre abbreviation
@@ -111,7 +119,7 @@ namespace API.Models
                 // načítanie zdrojového XML súboru s dátami
                 doc.Load(xmlFile);
                 // nájdenie projektu pre editáciu
-                XmlNode project = (XmlElement)doc.SelectSingleNode($"{nodeString}/[@id='{p.id}']");
+                XmlNode project = (XmlElement)doc.SelectSingleNode($"{nodeString}[@id='{p.id}']");
                 // ak sa našiel projekt na editáciu
                 if(project != null)
                 {
