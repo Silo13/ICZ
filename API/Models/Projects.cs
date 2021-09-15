@@ -105,7 +105,7 @@ namespace API.Models
         }
 
         // metóda na editáciu existujúceho projektu
-        public static string Put(Projects p)
+        public static string Edit(Projects p)
         {
             try
             {
@@ -120,6 +120,8 @@ namespace API.Models
                     project.SelectSingleNode("name").InnerText = p.name;
                     project.SelectSingleNode("abbreviation").InnerText = p.abbreviation;
                     project.SelectSingleNode("customer").InnerText = p.customer;
+
+                    // Pozn.: id projektu nie je možné meniť, slúži ako identifikátor
 
                     // uloženie zdrojového XML súboru
                     doc.Save(xmlFile);
