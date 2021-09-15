@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Xml;
 
 namespace API.Models
@@ -15,7 +17,7 @@ namespace API.Models
         public string abbreviation { get; set; }
         public string customer { get; set; }
 
-        // cesta k XML súboru so zdrojovými údajmi
+        // cesta k XML súboru so zdrojovými údajmi - zadáva sa absolútna cesta
         private static string xmlFile { get; set; } = ConfigurationManager.AppSettings["xmlFileProjects"];
         // štruktúra XML dokumentu
         private static string nodeString { get; set; } = "/projects/project";

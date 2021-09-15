@@ -1,10 +1,11 @@
 ﻿@using System.Configuration;
 
 @{
-    if ((Session["login"] == null) && (Request.RawUrl != "/Home/Login") && (Request.RawUrl != "/Home/Logout"))
+    // ak nie je používateľ prihlásený a nenachádza sa na stránke login, bude na ňu presmerovaný
+    if ((Session["login"] == null) && (Request.RawUrl != "/Home/Login"))
     {
         //return ConfigurationManager.AppSettings["webDevelop"].ToString();
-        Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}/Home/Login");
+        Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}Home/Login");
     }
 }
 
@@ -28,7 +29,8 @@
                 </button>
                 @Html.ActionLink("ICZ - Správa projektov firmy", "Projects", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            @if ((Session["login"] == null) && (Request.RawUrl != "/Home/Login") && (Request.RawUrl != "/Home/Logout"))
+            @* Ak existuje v session logi, môže sa odhlásiť *@
+            @if (Session["login"] != null)
             {
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">

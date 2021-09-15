@@ -20,17 +20,14 @@
         client.Headers.Add("Authorization", $"Basic {t}");
 
         string apiUrl = ConfigurationManager.AppSettings["apiUrl"].ToString();
-        //var x = client.DownloadString($"{apiUrl}/api/Projects");
         try
         {
             s = client.DownloadString($"{apiUrl}/api/Projects");
             Session["login"] = t;
-            Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}/Home/Projects");
+            Response.Redirect($"{ConfigurationManager.AppSettings["webUrl"].ToString()}Home/Projects");
         }
         catch (WebException e)
         {
-            //s = e.Status.ToString();
-            //s = e.Response.Stat .ToString();
             HttpWebResponse response = (HttpWebResponse)e.Response;
 
             s = response.StatusCode.ToString();
